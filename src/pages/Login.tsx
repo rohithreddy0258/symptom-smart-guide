@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { LogIn, Mail, Lock, GitHub, Google } from "lucide-react";
+import { LogIn, Mail, Lock, Github, LucideIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +16,26 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Create a Google icon component since lucide-react doesn't export a Google icon directly
+  const GoogleIcon: LucideIcon = (props) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M17.2 8.4 12 13.6l-5.2-5.2" />
+      <path d="m8.5 8.4 3.5 3.6 3.5-3.6" />
+    </svg>
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,11 +160,11 @@ const Login = () => {
               
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" className="w-full">
-                  <Google className="mr-2 h-4 w-4" />
+                  <GoogleIcon className="mr-2 h-4 w-4" />
                   Google
                 </Button>
                 <Button variant="outline" className="w-full">
-                  <GitHub className="mr-2 h-4 w-4" />
+                  <Github className="mr-2 h-4 w-4" />
                   GitHub
                 </Button>
               </div>
