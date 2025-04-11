@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,8 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Create a Google icon component using SVG
-  const GoogleIcon = React.forwardRef((props, ref) => (
+  // Create a properly typed Google icon component using SVG
+  const GoogleIcon = React.forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
