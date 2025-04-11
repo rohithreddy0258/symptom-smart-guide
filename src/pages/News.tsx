@@ -1,12 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar } from "lucide-react";
+import { Search, Calendar, RefreshCw } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
-const articles = [
+const fallbackArticles = [
   {
     id: 1,
     title: "New AI Technology Improves Early Cancer Detection",
@@ -59,6 +59,48 @@ const categories = ["All", "Technology", "Research", "Healthcare", "Nutrition"];
 const News = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [articles, setArticles] = useState(fallbackArticles);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const { toast } = useToast();
+
+  const fetchNews = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/news');
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      
+      const data = await response.json();
+      setArticles(data);
+      setLastUpdated(new Date());
+      
+      toast({
+        title: "News Updated",
+        description: "The latest news has been loaded.",
+      });
+    } catch (error) {
+      console.error("Failed to fetch news:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch news. Using fallback data.",
+        variant: "destructive",
+      });
+      setArticles(fallbackArticles);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+    
+    const intervalId = setInterval(fetchNews, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   const filteredArticles = articles.filter(article => {
     if (selectedCategory !== "All" && article.category !== selectedCategory) {
@@ -77,6 +119,22 @@ const News = () => {
         <p className="text-muted-foreground text-center mb-8">
           Stay informed about the latest advancements in healthcare and medical technology
         </p>
+        
+        <div className="flex justify-between items-center mb-4">
+          <div className="text-sm text-muted-foreground">
+            Last updated: {lastUpdated.toLocaleTimeString()} {lastUpdated.toLocaleDateString()}
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchNews} 
+            disabled={loading}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
         
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="md:w-2/3">
@@ -106,7 +164,11 @@ const News = () => {
           </div>
         </div>
         
-        {filteredArticles.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading news...</p>
+          </div>
+        ) : filteredArticles.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article) => (
               <Card key={article.id} className="overflow-hidden">

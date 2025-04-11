@@ -1,73 +1,77 @@
-# Welcome to your Lovable project
 
-## Project info
+# HealthFact - AI-Powered Healthcare Platform
 
-**URL**: https://lovable.dev/projects/8d53a79d-0464-4242-bde0-26254f976d79
+HealthFact is an advanced healthcare platform that combines AI technology with medical expertise to provide users with verified health information, symptom analysis, and doctor appointment scheduling.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Location-Based Doctor Search**: Find doctors near your location
+- **Real-Time News Updates**: Stay informed with the latest healthcare news
+- **Interactive AI Chatbot**: Get answers to your health questions
+- **Appointment Scheduling**: Book appointments with specialists
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8d53a79d-0464-4242-bde0-26254f976d79) and start prompting.
+- Frontend: React, TypeScript, Tailwind CSS
+- Backend: Python with Flask
+- Additional: Geolocation API, Real-time updates
 
-Changes made via Lovable will be committed automatically to this repo.
+## Running the Application
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js (v16+)
+- Python (v3.8+)
+- Flask (`pip install flask`)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. Clone the repository
+2. Install frontend dependencies:
+   ```
+   npm install
+   ```
+3. Install backend dependencies:
+   ```
+   pip install flask
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Running the Application
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+#### Option 1: Automated Start (Recommended)
 
-# Step 3: Install the necessary dependencies.
-npm i
+Run both the frontend and backend servers with a single command:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+python run_server.py
 ```
 
-**Edit a file directly in GitHub**
+This will:
+- Start the Python Flask backend server
+- Start the React frontend development server
+- Open the application in your browser
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### Option 2: Manual Start
 
-**Use GitHub Codespaces**
+1. Start the backend server:
+   ```
+   python api/healthfact_api.py
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. In a separate terminal, start the frontend server:
+   ```
+   npm start
+   ```
 
-## What technologies are used for this project?
+3. Open your browser and navigate to `http://localhost:3000`
 
-This project is built with:
+## Usage
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Allow location access when prompted to see doctors near you
+- Click the "Refresh" button on the News page to get the latest updates
+- Use the chatbot for any questions or assistance
 
-## How can I deploy this project?
+## Note
 
-Simply open [Lovable](https://lovable.dev/projects/8d53a79d-0464-4242-bde0-26254f976d79) and click on Share -> Publish.
+The backend server provides mock data for demonstration purposes. In a production environment, this would be connected to real databases and external APIs.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

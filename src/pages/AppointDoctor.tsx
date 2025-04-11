@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -17,11 +16,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, MapPin, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
-const doctors = [
+const fallbackDoctors = [
   {
     id: 1,
     name: "Dr. Sarah Johnson",
@@ -78,11 +77,80 @@ const AppointDoctor = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null);
   const { toast } = useToast();
+  
+  const [doctors, setDoctors] = useState(fallbackDoctors);
+  const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [locationStatus, setLocationStatus] = useState<string>("");
+
+  const getUserLocation = () => {
+    setLocationStatus("Getting your location...");
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLoc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(userLoc);
+          setLocationStatus("Location found");
+          fetchDoctors(userLoc.lat, userLoc.lng, selectedSpecialty);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setLocationStatus("Unable to retrieve your location");
+          fetchDoctors(null, null, selectedSpecialty);
+        }
+      );
+    } else {
+      setLocationStatus("Geolocation is not supported by your browser");
+      fetchDoctors(null, null, selectedSpecialty);
+    }
+  };
+
+  const fetchDoctors = async (lat: number | null, lng: number | null, specialty: string) => {
+    setLoading(true);
+    try {
+      let url = `/api/doctors?specialty=${encodeURIComponent(specialty)}`;
+      if (lat && lng) {
+        url += `&lat=${lat}&lng=${lng}`;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      
+      const data = await response.json();
+      setDoctors(data);
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch doctors. Using fallback data.",
+        variant: "destructive",
+      });
+      setDoctors(fallbackDoctors);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+
+  useEffect(() => {
+    if (userLocation) {
+      fetchDoctors(userLocation.lat, userLocation.lng, selectedSpecialty);
+    } else {
+      fetchDoctors(null, null, selectedSpecialty);
+    }
+  }, [selectedSpecialty]);
 
   const filteredDoctors = doctors.filter(doctor => {
-    if (selectedSpecialty !== "All Specialties" && doctor.specialty !== selectedSpecialty) {
-      return false;
-    }
     if (searchQuery && !doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !doctor.hospital.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
@@ -114,6 +182,24 @@ const AppointDoctor = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">Find and Appoint a Doctor</h1>
         <p className="text-muted-foreground text-center mb-8">Search for specialists and book your appointment</p>
+        
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center">
+              <MapPin className="h-4 w-4 mr-1 text-primary" />
+              <span className="text-sm">{locationStatus}</span>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={getUserLocation}
+              className="flex items-center gap-1"
+            >
+              <Navigation className="h-4 w-4" />
+              Update Location
+            </Button>
+          </div>
+        </div>
         
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div>
@@ -167,7 +253,11 @@ const AppointDoctor = () => {
           </div>
         </div>
         
-        {filteredDoctors.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading doctors...</p>
+          </div>
+        ) : filteredDoctors.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-6">
             {filteredDoctors.map((doctor) => (
               <Card key={doctor.id} className="overflow-hidden">
@@ -183,10 +273,17 @@ const AppointDoctor = () => {
                     <div className="p-6 md:w-2/3">
                       <h3 className="text-xl font-bold mb-1">{doctor.name}</h3>
                       <p className="text-primary mb-1">{doctor.specialty}</p>
-                      <div className="flex items-center mb-3">
+                      <div className="flex items-center mb-2">
                         <MapPin className="h-4 w-4 text-muted-foreground mr-1" />
                         <span className="text-sm text-muted-foreground">{doctor.hospital}</span>
                       </div>
+                      
+                      {doctor.distance && (
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {doctor.distance} km from your location
+                        </p>
+                      )}
+                      
                       <div className="flex items-center mb-4">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
