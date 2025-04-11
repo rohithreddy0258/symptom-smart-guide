@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,6 +17,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Create a properly typed Google icon component using SVG
   const GoogleIcon = React.forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
@@ -54,17 +55,21 @@ const Login = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
+    // Simulate API call with successful login
     setTimeout(() => {
       setIsLoading(false);
+      
+      // Store login state in localStorage
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", email);
       
       toast({
         title: "Success",
         description: "You have been logged in successfully",
       });
       
-      // In a real application, we'd handle authentication and redirect here
-      window.location.href = "/";
+      // Navigate to home page
+      navigate("/");
     }, 1500);
   };
 
@@ -73,9 +78,9 @@ const Login = () => {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to HealthFact</CardTitle>
             <CardDescription>
-              Log in to your HealthTech account
+              Log in to your HealthFact account
             </CardDescription>
           </CardHeader>
           

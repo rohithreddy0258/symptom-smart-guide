@@ -1,6 +1,5 @@
-
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { 
@@ -11,14 +10,35 @@ import {
   Menu, 
   X, 
   LogIn, 
-  UserPlus 
+  UserPlus,
+  LogOut
 } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in on component mount
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const email = localStorage.getItem("userEmail") || "";
+    
+    setIsLoggedIn(loggedIn);
+    setUserEmail(email);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+  
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    setUserEmail("");
+    navigate("/");
   };
 
   return (
@@ -27,7 +47,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-primary">HealthTech</span>
+              <span className="text-xl font-bold text-primary">HealthFact</span>
             </Link>
           </div>
 
@@ -53,18 +73,31 @@ const Navbar = () => {
 
           <div className="hidden md:flex md:items-center md:space-x-2">
             <ThemeToggle />
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="flex items-center">
-                <LogIn className="mr-1 h-4 w-4" />
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="default" size="sm" className="flex items-center bg-primary">
-                <UserPlus className="mr-1 h-4 w-4" />
-                Sign Up
-              </Button>
-            </Link>
+            
+            {isLoggedIn ? (
+              <>
+                <span className="text-sm mr-2">{userEmail}</span>
+                <Button variant="ghost" size="sm" className="flex items-center" onClick={handleLogout}>
+                  <LogOut className="mr-1 h-4 w-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <LogIn className="mr-1 h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="default" size="sm" className="flex items-center bg-primary">
+                    <UserPlus className="mr-1 h-4 w-4" />
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -121,26 +154,38 @@ const Navbar = () => {
               About Us
             </Link>
             <div className="flex flex-col space-y-2 pt-2">
-              <Link 
-                to="/login" 
-                className="w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Button variant="outline" className="w-full flex items-center justify-center">
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Login
-                </Button>
-              </Link>
-              <Link 
-                to="/signup" 
-                className="w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Button variant="default" className="w-full flex items-center justify-center bg-primary">
-                  <UserPlus className="mr-2 h-5 w-5" />
-                  Sign Up
-                </Button>
-              </Link>
+              {isLoggedIn ? (
+                <div className="flex flex-col space-y-2 pt-2">
+                  <div className="px-3 py-2 text-sm">{userEmail}</div>
+                  <Button variant="outline" className="w-full flex items-center justify-center" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-5 w-5" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-2 pt-2">
+                  <Link 
+                    to="/login" 
+                    className="w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Button variant="outline" className="w-full flex items-center justify-center">
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Login
+                    </Button>
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Button variant="default" className="w-full flex items-center justify-center bg-primary">
+                      <UserPlus className="mr-2 h-5 w-5" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
