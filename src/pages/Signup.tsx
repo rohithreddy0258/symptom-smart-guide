@@ -1,14 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { UserPlus, Mail, Lock, User, Github, LucideIcon } from "lucide-react";
+import { UserPlus, Mail, Lock, User, Github } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import React from "react";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -19,8 +19,8 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Create a Google icon component since lucide-react doesn't export a Google icon directly
-  const GoogleIcon: LucideIcon = (props) => (
+  // Create a Google icon component using SVG
+  const GoogleIcon = React.forwardRef((props, ref) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -31,13 +31,15 @@ const Signup = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      ref={ref}
       {...props}
     >
       <circle cx="12" cy="12" r="10" />
-      <path d="M17.2 8.4 12 13.6l-5.2-5.2" />
-      <path d="m8.5 8.4 3.5 3.6 3.5-3.6" />
+      <path d="M15.5 8.5L12 12M12 12L8.5 15.5M12 12L8.5 8.5M12 12L15.5 15.5" />
     </svg>
-  );
+  ));
+  
+  GoogleIcon.displayName = "GoogleIcon";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
